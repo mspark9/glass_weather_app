@@ -10,9 +10,9 @@ import {
 } from 'lucide-react'
 import React from 'react'
 import * as LucideIcons from 'lucide-react'
-import { formatTemperature, getWeatherIcon } from '../utils/weatherUtils'
+import { formatTemperature, formatTime, getWeatherIcon } from '../utils/weatherUtils'
 
-const WeatherCard = ({ weather }) => {
+const WeatherCard = ({ weather, units }) => {
     const iconName = getWeatherIcon(weather.weather[0])
     const IconComponent = LucideIcons[iconName]
 
@@ -44,7 +44,7 @@ const WeatherCard = ({ weather }) => {
         {
             icon: Thermometer,
             label: 'Feels Like',
-            value: `${formatTemperature(weather.main.feels_like)}°`,
+            value: `${formatTemperature(weather.main.feels_like, units)}°${units}`,
             color: 'text-orange-300',
         },
     ];
@@ -64,21 +64,31 @@ const WeatherCard = ({ weather }) => {
                 </div>
 
                 <div className="text-right">
-                    <div className="text-white/70 text-sm">Friday, 20 February 2026</div>
-                    <div className="text-white/50 text-xs">12:08 PM</div>
+                    <div className="text-white/70 text-sm">{new Date(weather.dt * 1000).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'short',
+                        day: 'numeric',
+                    })}</div>
+                    <div className="text-white/50 text-xs">{new Date(weather.dt * 1000).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    })}</div>
                 </div>
             </div>
 
             {/* Main Weather Display */}
             <div className="flex items-center justify-between mb-10">
                 <div className="flex-1">
-                    <div className='text-7xl font-bold text-white mb-3 tracking-tight'>9°
-                        <span className='text-4xl font-normal text-white/70'>C</span>
+                    <div className='text-7xl font-bold text-white mb-3 tracking-tight'>
+                        {formatTemperature(weather.main.temp, units)}°
+                        <span className='text-4xl font-normal text-white/70'>{units}</span>
                     </div>
-                    <div className='text-white/90 text-xl capitalize mb-2 font-medium'>A little Cloudy</div>
+                    <div className='text-white/90 text-xl capitalize mb-2 font-medium'>
+                        {weather.weather[0].description}
+                    </div>
                     <div className="flex items-center space-x-4 text-white/60 text-sm">
-                        <span>H: 12°</span>
-                        <span>L: 4°</span>
+                        <span>H: {formatTemperature(weather.main.temp_max, units)}°</span>
+                        <span>L: {formatTemperature(weather.main.temp_min, units)}°</span>
                     </div>
                 </div>
                 <div className="text-white/90 transform hover:scale-110 transition-transform duration-300">
@@ -88,17 +98,21 @@ const WeatherCard = ({ weather }) => {
 
             {/* Weather Stats Grid */}
             <div className='grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6'>
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group">
-                    <div className="flex items-center space-x-3 mb-2">
-                        <div className='p-2 rounded-full bg-white/10 group-hover:bg-white/20 transition-all'>
-                            <Eye className='w-4 h-4 text-cyan-300' />
+
+                {WeatherStats.map((stat, index) => (
+                    <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group" key={index}>
+                        <div className="flex items-center space-x-3 mb-2">
+                            <div className='p-2 rounded-full bg-white/10 group-hover:bg-white/20 transition-all'>
+                                <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                            </div>
+                            <span className='text-white/70 text-sm font-medium'>
+                                {stat.label}
+                            </span>
                         </div>
-                        <span className='text-white/70 text-sm font-medium'>
-                            Visibility
-                        </span>
+                        <div className='text-white font-semibold text-lg pl-11'>{stat.value}</div>
                     </div>
-                    <div className='text-white font-semibold text-lg pl-11'>10 km</div>
-                </div>
+                ))}
+
             </div>
 
             {/* Sunrise and Sunset */}
@@ -110,7 +124,7 @@ const WeatherCard = ({ weather }) => {
                         </div>
                         <span className='text-white/80 text-sm font-medium'>Sunrise</span>
                     </div>
-                    <div className='text-white font-semibold text-lg pl-11'>07:28 AM</div>
+                    <div className='text-white font-semibold text-lg pl-11'>{formatTime(weather.sys.sunrise)}</div>
                 </div>
 
                 <div className="bg-linear-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-4 border border-orange-400/20">
@@ -120,7 +134,7 @@ const WeatherCard = ({ weather }) => {
                         </div>
                         <span className='text-white/80 text-sm font-medium'>Sunset</span>
                     </div>
-                    <div className='text-white font-semibold text-lg pl-11'>08:22 PM</div>
+                    <div className='text-white font-semibold text-lg pl-11'>{formatTime(weather.sys.sunset)}</div>
                 </div>
             </div>
         </div>

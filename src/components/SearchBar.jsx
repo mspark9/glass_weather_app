@@ -2,7 +2,7 @@ import { MapPin, Search, X } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { searchCities } from '../utils/weatherAPI'
 
-const SearchBar = ({ onSearch, loading }) => {
+const SearchBar = ({ onSearch, loading, onLocationSearch }) => {
     const [query, setQuery] = useState('')
     const [searchLoading, setSearchLoading] = useState(false)
     const [showSuggestion, setShowSuggestion] = useState(false)
@@ -59,25 +59,42 @@ const SearchBar = ({ onSearch, loading }) => {
         }
     }, [])
 
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        if (query.trim()) {
+            onSearch(query.trim())
+            setQuery("")
+            setShowSuggestion(false)
+        }
+    }
+
     return (
         <div className='relative w-full max-w-2xl' ref={searchRef}>
-            <form className='relative'>
+            <form className='relative' onSubmit={handleSubmit}>
                 <div className="relative group">
-                    <Search className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-50 w-5 h-5 group-focus-within:text-white transition-all z-50' />
+                    <button
+                        type="submit"
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-50 p-0 bg-transparent border-none cursor-pointer"
+                    >
+                        <Search className="text-gray-50 w-5 h-5 group-focus-within:text-white transition-all" />
+                    </button>
                     <input type="text" placeholder='Search for city name worldwide..'
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className='w-full pl-12 pr-24 py-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all focus:border-white/40 duration-300 hover:bg-white/15' />
 
-                    {query ? (
-                        <button className='absolute right-14 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-all p-1 rounded-full hover:bg-white/10' onClick={clearSearch}>
+                    {query && (
+                        <button className='absolute right-22 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-all p-1 rounded-full hover:bg-white/10' onClick={clearSearch}>
                             <X />
                         </button>
-                    ) : (
-                        <button className='absolute right-14 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-all p-1 rounded-full hover:bg-white/10'>
-                            <MapPin />
-                        </button>
                     )}
+
+                    <button className='absolute right-14 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-all p-1 rounded-full hover:bg-white/10'
+                        onClick={onLocationSearch}
+                        disabled={loading}>
+                        <MapPin />
+                    </button>
+
                 </div>
             </form>
 

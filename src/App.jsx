@@ -2,13 +2,14 @@ import './App.css'
 import ErrorMessage from './components/ErrorMessage'
 import LoadingSpinner from './components/LoadingSpinner'
 import SearchBar from './components/SearchBar'
+import TemperatureToggle from './components/TemperatureToggle'
 import WeatherCard from './components/WeatherCard'
 import WeatherForecast from './components/WeatherForecast'
 import useWeather from './hook/useWeather'
 
 function App() {
     // hook data
-    const { loading, error, fetchWeatherByCity, currentWeather } = useWeather()
+    const { loading, error, fetchWeatherByCity, currentWeather, fetchWeatherByLocation, units, toggleUnit } = useWeather()
     // console.log(currentWeather)
 
     return (
@@ -40,7 +41,8 @@ function App() {
 
                         {/* Search Bar */}
                         <div className='flex flex-col lg:flex-row items-center justify-center space-y-6 lg:space-y-0 lg:space-x-6 mb-12'>
-                            <SearchBar onSearch={fetchWeatherByCity} loading={loading} />
+                            <SearchBar onSearch={fetchWeatherByCity} loading={loading} onLocationSearch={fetchWeatherByLocation} />
+                            <TemperatureToggle units={units} onToggle={toggleUnit} />
                         </div>
                     </div>
 
@@ -68,7 +70,7 @@ function App() {
                                 <div>
                                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                                         <div className="xl:col-span-2">
-                                            <WeatherCard weather={currentWeather} />
+                                            <WeatherCard weather={currentWeather} units={units} />
                                         </div>
                                         <div className="xl:col-span-1">
                                             <WeatherForecast />
