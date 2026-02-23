@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getCurrentWeather, getCurrentWeatherByCoords } from '../utils/weatherAPI'
+import { getCurrentWeather, getCurrentWeatherByCoords, getWeatherForecast } from '../utils/weatherAPI'
 
 const useWeather = () => {
     const [loading, setLoading] = useState(false)
@@ -12,10 +12,12 @@ const useWeather = () => {
         setLoading(true)
         setError(null)
         try {
-            const [weatherData] = await Promise.all([
+            const [weatherData, forecastData] = await Promise.all([
                 getCurrentWeather(city),
+                getWeatherForecast(city),
             ])
             setCurrentweather(weatherData)
+            setForecast(forecastData)
         } catch (error) {
             setError(
                 error instanceof Error ? error.message : "Failed to fetch weather data"
